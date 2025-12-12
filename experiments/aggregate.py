@@ -138,7 +138,7 @@ def examples_table(runs):
     from lm_eval import load_wrapped
     from run import morph_items
     lines = ["\\begin{table}[!ht]", "\\centering",
-             "\\caption{Example segmentations of evaluation words absent from the training text (seed 0). Words are the first, middle and last of the alphabetically sorted unseen forms without capitals of 8 to 14 characters with at least one gold boundary; the word-initial-marker BPE is omitted for space. Vertical bars mark boundaries; the gold column shows the lemma-derived boundaries.}",
+             "\\caption{Example segmentations of evaluation words absent from the training text (seed 0). The evaluation words are taken from unseen forms without capitals, have between 8 and 14 characters and at least one gold boundary. We show the first, middle and last word of an alphabetically sorted list. To save space, the word-initial-marker BPE is omitted. Vertical bars (|) indicate boundaries, and gold contains the ground-truth boundaries inferred from the lemma.}",
              "\\label{tab:examples}", "\\scriptsize", "\\setlength{\\tabcolsep}{2.5pt}", "\\begin{tabular}{llllll}", "\\toprule",
              "Lang. & Gold & BPE, free marker & Content-weighted & Lemma2Word & Unigram \\\\", "\\midrule"]
     for lang in LANGS:
@@ -173,7 +173,7 @@ def llm_table(runs):
     if not summaries:
         return
     lines = ["\\begin{table}[!ht]", "\\centering",
-             "\\caption{A language model (Claude Sonnet) prompted to segment words into morphemes, scored on a fixed random sample of the gold word forms, beside three tokenizers (seed 0) scored on the same words. \\emph{Invalid}: answers that changed the characters of the word and were excluded. Boundary precision, recall and F1 in \\%; tokens per word is the number of pieces.}",
+             "\\caption{Claude Sonnet segmenting words into morphemes, on a fixed random sample of gold standard forms. The seed 0 tokenizers are evaluated on the same words. Invalid answers are answers that change the characters of the word and they were not counted in the computation of the scores. The table reports boundary precision, recall and F1 (in \\%), and the number of tokens per word after segmentation.}",
              "\\label{tab:llm}", "\\small", "\\setlength{\\tabcolsep}{3.5pt}", "\\begin{tabular}{lrrcccccccc}", "\\toprule",
              " & & & \\multicolumn{4}{c}{language model} & \\multicolumn{3}{c}{recall of tokenizers on the same words} \\\\",
              "\\cmidrule(lr){4-7}\\cmidrule(lr){8-10}",
@@ -262,7 +262,7 @@ def main():
     macro("nVocabBudget", "8,000")
 
     # ---- main tables
-    table_by_language(runs, lambda m: m["morph"]["lexicon"]["all"]["f1"], "F", "Boundary F1 (\\%) against the lemma-derived morpheme boundaries of MorphScore, all unique word forms. Mean $\\pm$ standard deviation over three training seeds; best per language in bold.", "tab:f1")
+    table_by_language(runs, lambda m: m["morph"]["lexicon"]["all"]["f1"], "F", "Boundary F1 (\\%) compared to MorphScore gold boundaries derived from lemmas, over all unique word forms. Average and standard deviation over 3 training seeds. The best result for each language is in bold.", "tab:f1")
     table_by_language(runs, lambda m: m["morph"]["lexicon"]["all"]["precision"], "P", "Boundary precision (\\%).", "tab:precision")
     table_by_language(runs, lambda m: m["morph"]["lexicon"]["all"]["recall"], "R", "Boundary recall (\\%).", "tab:recall")
     table_by_language(runs, lambda m: m["heldout"]["tokens_per_word"], "Tpw", "Tokens per whitespace word on held-out Wikipedia paragraphs (lower is more compact).", "tab:tpw", scale=1.0, d=3, higher_better=False)
@@ -273,7 +273,7 @@ def main():
             m["lm"] = json.loads((RES / m["lang"] / f"{m['method']}_v{m['vocab_budget']}_s{m['seed']}" / "lm.json").read_text())
     lm_runs = {k: v for k, v in lm_runs.items() if v}
     if lm_runs:
-        table_by_language(lm_runs, lambda m: m["lm"]["bits_per_char"], "Bpc", "Bits per character of a 7M-parameter language model trained for six passes over the same text with each tokenizer (lower is better). Mean $\\pm$ standard deviation over the three tokenizer seeds.", "tab:bpc", scale=1.0, d=3, higher_better=False)
+        table_by_language(lm_runs, lambda m: m["lm"]["bits_per_char"], "Bpc", "Bits per character in the language model trained on the output of the tokenizer. The language model has 7M parameters and is trained for 6 passes over the same text with each tokenizer. Lower scores are better, and we show the mean and one standard deviation for the three tokenizer seeds.", "tab:bpc", scale=1.0, d=3, higher_better=False)
 
     # ---- step-count control for the probe: the same tokenizer trained for 10% fewer and 10% more passes
     base = RES / "en" / "bpe_v8000_s0"
@@ -297,7 +297,7 @@ def main():
         macro(f"nAllP{pre}{LANG_MACRO[lang]}", f"{100 * np.mean([v['p_all'] for v in vals]):.1f}")
         macro(f"nSpanShare{pre}{LANG_MACRO[lang]}", f"{100 * np.mean([v['share_span'] for v in vals]):.1f}")
     lines = ["\\begin{table}[!ht]", "\\centering",
-             "\\caption{Word boundaries spanned by a token on held-out text: share of boundaries (\\%), mean probability (\\%) of the POS transition at spanned boundaries, and the same mean over all boundaries. Seed 0; the most frequent spanned transition and token are shown for the POS-weighted model.}",
+             "\\caption{Percentage of word boundaries spanned by a token in held-out text, mean probability (\\%) of the POS transition at spanned boundaries, and the same mean over all boundaries. Results are from seed 0; the most common spanned transition and token are shown for the POS-weighted model.}",
              "\\label{tab:span}", "\\footnotesize", "\\setlength{\\tabcolsep}{3.5pt}", "\\begin{tabular}{llccclc}", "\\toprule",
              "Language & System & spanned (\\%) & $P$, spanned & $P$, all & top transition & top token \\\\", "\\midrule"]
     for lang in LANGS:
@@ -315,7 +315,7 @@ def main():
 
     # ---- Lemma2Word variants: lexicon vs online, seen vs unseen, UD test split
     lines = ["\\begin{table}[!ht]", "\\centering",
-             "\\caption{Lemma2Word boundary recall and precision (\\%) by word subset: all unique forms, forms absent from the tokenizer's training text, and forms from the UD test split. \\emph{Lexicon} uses only boundaries and affixes learned from the training text; \\emph{online} also lemmatizes the evaluation word with Stanza at tokenization time. Mean over three seeds.}",
+             "\\caption{Boundary recall and precision (\\%) in Lemma2Word, by subset of words and variant. The lexicon variant uses only learned boundaries and affixes, the online variant lemmatizes the word to be tokenized with Stanza. Results averaged over three random seeds.}",
              "\\label{tab:l2w}", "\\small", "\\setlength{\\tabcolsep}{3.5pt}", "\\begin{tabular}{llcccccc}", "\\toprule",
              " & & \\multicolumn{2}{c}{all} & \\multicolumn{2}{c}{unseen} & \\multicolumn{2}{c}{UD test} \\\\",
              "\\cmidrule(lr){3-4}\\cmidrule(lr){5-6}\\cmidrule(lr){7-8}", "Language & Variant & R & P & R & P & R & P \\\\", "\\midrule"]

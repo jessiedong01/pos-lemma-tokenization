@@ -1,6 +1,6 @@
 \begin{table}[!ht]
 \centering
-\caption{A language model (Claude Sonnet) prompted to segment words into morphemes, scored on a fixed random sample of the gold word forms, beside three tokenizers (seed 0) scored on the same words. \emph{Invalid}: answers that changed the characters of the word and were excluded. Boundary precision, recall and F1 in \%; tokens per word is the number of pieces.}
+\caption{Claude Sonnet segmenting words into morphemes, on a fixed random sample of gold standard forms. The seed 0 tokenizers are evaluated on the same words. Invalid answers are answers that change the characters of the word and they were not counted in the computation of the scores. The table reports boundary precision, recall and F1 (in \%), and the number of tokens per word after segmentation.}
 \label{tab:llm}
 \small
 \setlength{\tabcolsep}{3.5pt}

@@ -17,17 +17,18 @@
 \newcommand{\tamil}[1]{{\tamilfont #1}}
 \captionsetup{font=small,labelfont=bf}
 \setlength{\bibsep}{3pt}
+\setlength{\emergencystretch}{1em}
 \input{numbers}
 
 \title{\input{sections/title}}
 \author{%
-  Anish Chaudhuri\thanks{Equal contribution.}\\
-  Stanford University\\
-  \texttt{anishch@stanford.edu}
-  \and
-  Jessie Dong\footnotemark[1]\\
+  Jessie Dong\thanks{Equal contribution.}\\
   Stanford University\\
   \texttt{jessiedong@stanford.edu}
+  \and
+  Anish Chaudhuri\footnotemark[1]\\
+  Stanford University\\
+  \texttt{anishch@stanford.edu}
   \and
   Maya Vendhan\footnotemark[1]\\
   Stanford University\\
@@ -48,8 +49,10 @@
 \input{sections/discussion}
 \input{sections/conclusion}
 
+{\sloppy
 \paragraph{Author contributions.}
 \input{sections/contributions}
+\par}
 
 \bibliographystyle{plainnat}
 \bibliography{refs}

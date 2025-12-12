@@ -1,15 +1,27 @@
 \subsection{A Language Model as a Segmenter}\label{sec:res-llm}
-Table~\ref{tab:llm} reports the segmentation study of Section~\ref{sec:llm}.
-For each language, 400 word forms were drawn at random (seed 0) from the gold list, and Claude Sonnet (model string \texttt{claude-sonnet-5-5}, October 2026) was asked, in batches of 40 words, to insert plus signs at the morpheme boundaries without changing a character; the prompt is given in Appendix~\ref{app:prompt}.
-An answer whose characters differ from the word is invalid and is excluded from the scores.
-To compare like with like, the seed-0 tokenizers are scored on exactly the words the model answered validly.
+Table~\ref{tab:llm} shows the results of the study described in Section~\ref{sec:llm}.
+For each language, a sample of 400 word forms were randomly selected from the gold standard list using seed 0.
+The Claude Sonnet model (\texttt{claude-sonnet-5-5}, October 2026 version) was selected and it was prompted to add plus signs between morphemes in batches of 40 words.
+The prompt used does not allow any character modification and is given in Appendix~\ref{app:prompt}.
+Answers that change the characters of the word are invalid and they were not counted when computing the scores.
+To compare with the same seed 0 tokenizers, we have evaluated them on the same words that the model had given valid answers for.
 
 \input{tables/llm}
 
-The model recovers more gold boundaries than any tokenizer in four languages, with \nLlmREnglish\% recall in English against \nLlmSampleLtwREnglish\% for Lemma2Word on the same words, \nLlmRTamil\% against \nLlmSampleLtwRTamil\% in Tamil and \nLlmRTurkish\% against \nLlmSampleLtwRTurkish\% in Turkish, and it trails Lemma2Word in Danish (\nLlmRDanish\% against \nLlmSampleLtwRDanish\%).
-Its precision is between \nLlmPSpanish\% and \nLlmPEnglish\%, because it marks derivational affixes and compound parts that the lemma-derived gold standard does not, producing \nLlmTpwEnglish{} to \nLlmTpwSpanish{} pieces per word where the gold has at most three.
-Almost every answer preserved the characters in the four Latin-script languages (\nLlmInvalidSpanish{} invalid answer in Spanish, none elsewhere).
-Tamil was harder in two ways.
-The model reasoned at length before answering, so that 40-word batches overran the reply length and the unanswered words had to be re-asked in batches of 15, and \nLlmInvalidTamil{} answers wrote the underlying morphemes instead of the surface string (\tamil{கள்}\,+\,\tamil{உக்கு} for \tamil{களுக்கு}, where the vowel of the suffix fuses with the preceding consonant in writing), which the character constraint forbids.
-The study used about 2,000 words and a few dollars of API usage, and it shows what the model knows about morphology rather than what a tokenizer built from it would do: the answers have no fixed vocabulary, are not guaranteed to be consistent across occurrences of a word, and cost several orders of magnitude more per word than any tokenizer in Table~\ref{tab:f1}.
-Used offline, to write a segmentation lexicon in the manner of Lemma2Word's, such answers could supply boundaries where no lemmatizer exists; that use is not evaluated here.
+The model has been able to surpass the recall on gold boundaries of any of the tokenizers in four languages.
+In English the model gets \nLlmREnglish\% compared to \nLlmSampleLtwREnglish\% for Lemma2Word, in Tamil \nLlmRTamil\% vs.\ \nLlmSampleLtwRTamil\% and in Turkish \nLlmRTurkish\% vs.\ \nLlmSampleLtwRTurkish\%.
+The model has been ranked behind Lemma2Word in Danish with \nLlmRDanish\% recall vs.\ \nLlmSampleLtwRDanish\%.
+The precision of the model is ranging between \nLlmPSpanish\% and \nLlmPEnglish\%.
+The model marks derivational affixes and parts of compounds that are not included in the lemma-based gold standard, and the number of pieces per word is between \nLlmTpwEnglish{} and \nLlmTpwSpanish{} compared to the maximum of 3 pieces per word in the gold.
+Almost all of the answers preserve the characters of the words in the Latin script, and there was only \nLlmInvalidSpanish{} invalid answer for Spanish and none for the other Latin-script languages.
+
+Tamil had two issues.
+The model had long reasoning chains, the 40-word batches exceeded the response length, and the unanswered words had to be re-asked in 15-word batches.
+The model had also written the underlying morphemes in \nLlmInvalidTamil{} answers rather than the surface forms, violating the character constraint.
+In one of them the model gave \tamil{கள்}\,+\,\tamil{உக்கு} instead of \tamil{களுக்கு}, since the suffix vowel fuses with the consonant.
+The study used approximately 2,000 words and the cost of the API was minimal (a few dollars).
+This evaluation is not showing what a tokenizer built on top of the model's responses would be capable of, but what the model knows about the morphology.
+The answers from the model do not have a fixed vocabulary and they are not guaranteed to be in a consistent format even if the same word occurs multiple times.
+The cost per word is several orders of magnitude more than any of the tokenizers shown in Table~\ref{tab:f1}.
+The answers could be used off-line to generate a segmentation lexicon similar to the output of Lemma2Word to provide boundaries in places where a lemmatizer doesn't exist.
+This use case is not evaluated in the paper.

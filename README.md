@@ -1,10 +1,10 @@
-# Part-of-Speech and Lemma Information in Subword Tokenization
+# Lemma Boundaries Improve Morphological Alignment of Subword Tokenizers but Worsen Language-Model Loss
 
 Byte-pair encoding and the unigram language model build their vocabularies from character statistics alone. This repository contains the code, the data preparation and the paper for a controlled evaluation of tokenizers that also use the part-of-speech tags and lemmas a standard tagger provides, in English, Spanish, Danish, Tamil and Turkish. Weighting BPE merges by the probability of the part-of-speech transition at each word boundary leaves boundary accuracy and compression unchanged, weighting merges inside content words has an effect that depends on the language, and Lemma2Word, which segments each word at the boundary its lemma implies, raises boundary recall by 23 to 77 points at a cost of four to eight percent more tokens. A language-model probe orders the tokenizers differently, with the unigram model lowest in bits per character and Lemma2Word highest in every language.
 
 ## Paper
 
-[Part-of-Speech and Lemma Information in Subword Tokenization: A Controlled Evaluation in Five Languages](paper/main.pdf) (`paper/main.pdf`; the LaTeX source is in `paper/`).
+[Lemma Boundaries Improve Morphological Alignment of Subword Tokenizers but Worsen Language-Model Loss](paper/main.pdf) (`paper/main.pdf`; the LaTeX source is in `paper/`).
 
 ## Reproduction
 

@@ -1,24 +1,42 @@
 \subsection{Language-Model Probe}\label{sec:res-lm}
-Table~\ref{tab:bpc} and Figure~\ref{fig:bpc} report the bits per character of the language model trained on each tokenizer's output, with one model per tokenizer seed.
-The seed-to-seed standard deviation is below 0.01 bits for most entries and 0.03 at worst, so differences of a few hundredths are reliable at this scale.
+Table~\ref{tab:bpc} reports the bits per character of the language model trained on the different tokenizers, and Figure~\ref{fig:bpc} shows the same data graphically.
+A language model is trained for each tokenizer seed, and across these different seeds the standard deviation is less than 0.01 bits in most cases, and never more than 0.03 bits.
+Differences of a few hundredths of a bit can therefore be considered reliable at this scale.
 
 \input{tables/bpc}
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=\linewidth]{figures/fig_bpc.pdf}
-\caption{Bits per character of a 7M-parameter language model trained for six passes over the same text with each tokenizer (lower is better). Points are means over the three tokenizer seeds and error bars span one standard deviation; the vertical axis starts at 2.4 bits so that the differences are visible.}
+\caption{Bits per character in the language model trained on the output of the tokenizer. The language model has 7M parameters and is trained for 6 passes over the same text with each tokenizer. Lower scores are better, and we show the mean and one standard deviation for the three tokenizer seeds. The y-axis starts at 2.4 bits to show the differences.}
 \label{fig:bpc}
 \end{figure}
 
-The ordering by bits per character is not the ordering by boundary F1.
-The unigram model, second by F1, is first by a wide margin in every language, at \nBpcUniEnglish{} bits against \nBpcBpeEnglish{} for free-marker BPE in English and \nBpcUniTamil{} against \nBpcBpeTamil{} in Tamil.
-Lemma2Word, first by F1 everywhere, is last by bits per character everywhere (\nBpcLtwEnglish{} in English).
-Cutting words at the stem boundary before subword training removes frequent whole-word tokens from the vocabulary, and the extra tokens it produces are not predictable enough, for a model of this size, to pay for themselves.
-The word-initial-marker BPE, last by F1 in four languages, is better than free-marker BPE by bits per character in four languages (\nBpcHfBpeEnglish{} against \nBpcBpeEnglish{} in English); the tokens that span word boundaries, which make the free-marker variant more compact, do not help prediction.
-The POS weighting changes bits per character by less than 0.03 in every language, in the direction of a small improvement, with the largest seed-to-seed variation of the table in Turkish, and its two ablations again coincide with it.
-The content-word weighting lowers bits per character in Tamil (\nBpcPosContentTamil{} against \nBpcBpeTamil), where it also raised boundary F1 most, and raises them in Turkish.
+However, the ordering by bits-per-character does not match the ordering by boundary-F1.
+The unigram model has been ranked second by F1 and first by bits-per-character in all languages.
+In English it is first with \nBpcUniEnglish{} bits-per-character compared to \nBpcBpeEnglish{} for free-marker BPE.
+In Tamil the first place is taken by the unigram model with \nBpcUniTamil{} bits compared to \nBpcBpeTamil{} for free-marker BPE.
+Lemma2Word has been ranked first by F1 and last by bits-per-character in all languages.
+In English Lemma2Word is ranked last with \nBpcLtwEnglish{} bits-per-character.
+The word cutting using stem boundaries before training the subword tokenizer is removing frequent full-word tokens and adding tokens that are too unpredictable for a model of this size to compensate.
 
-Because every model is trained for six passes over the same text, a tokenizer that produces more tokens also gives its model more optimizer steps, 8.6\% more for the unigram model than for free-marker BPE in English.
-A control that trains the free-marker BPE model of seed 0 for 5.4 and 6.6 passes, 10\% fewer and 10\% more steps, moves its bits per character from \nBpcControlBase{} to \nBpcControlLow{} and \nBpcControlHigh{}, far less than the gaps between tokenizers, and Lemma2Word produces more tokens than free-marker BPE yet scores worse, so the step count does not explain the ordering.
-What the probe shows is that morphological alignment and modeling quality do not move together at this scale, in agreement with \citet{bostrom2020bpe} on the unigram model and with the broader finding that intrinsic tokenizer measures predict downstream quality imperfectly~\cite{schmidt2024tokenization,ali2024tokenizer}.
+Word-initial BPE has been ranked last by F1 in four languages.
+In four languages, it has been ranked ahead of free-marker BPE by bits-per-character.
+In English it is ranked ahead with \nBpcHfBpeEnglish{} vs.\ \nBpcBpeEnglish.
+The tokens crossing word boundaries, which help compactness in free-marker BPE, do not help in prediction.
+POS weighting has been changing bits-per-character by less than 0.03 in all the languages, so it seems it is pointing in a positive direction but with a small contribution.
+Interestingly, the table shows that for Turkish the seed-to-seed variation in bits-per-character is the highest.
+The two ablations with POS weighting give the same result.
+Content word weighting has been reducing bits-per-character in Tamil to \nBpcPosContentTamil{} vs.\ \nBpcBpeTamil.
+This was also the language where it has been giving the largest improvement in boundary-F1.
+On the other hand, in Turkish content-word weighting has been increasing the bits-per-character numbers.
+
+Since all the tokenizers are trained on the same text, the number of passes is the same for all models; they go over the data 6 times.
+Since a higher token count therefore leads to more optimizer steps, the unigram model has 8.6\% more optimizer steps than free-marker BPE in English.
+To control for the change in optimizer steps, we have trained a model for free-marker BPE in seed 0 with 10\% fewer optimizer steps (5.4 passes over the data) and 10\% more optimizer steps (6.6 passes).
+The bits-per-character changes from \nBpcControlBase{} to \nBpcControlLow{} and \nBpcControlHigh{} respectively.
+These changes are small compared to the ones between tokenizers, so the step count cannot be used to explain the model ranking.
+Since Lemma2Word has a higher number of tokens than free-marker BPE and it has been ranked behind, the reason cannot be the optimizer step count alone.
+
+These results indicate that morphological alignment and the quality of the model do not move together at this scale, which agrees with the conclusions reached about the unigram model by \citet{bostrom2020bpe}.
+This also supports the finding that the intrinsic measures for tokenizers are not perfect predictors for downstream tasks~\cite{ali2024tokenizer,schmidt2024tokenization}.
